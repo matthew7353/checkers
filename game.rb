@@ -8,6 +8,7 @@ class Game
         @turn = 'w'
         @selected = false
         @can_beat = false
+        @can_change = true
     end
   
     def event(x, y)
@@ -15,7 +16,7 @@ class Game
         y = (y - 25) / 100
         square = x + 8 * y
 
-        if square >= 0 and square < 64 and @board.square_value(square) == @turn
+        if square >= 0 && square < 64 && @board.square_value(square) == @turn && @can_change
             if @selected
                 @board.unselect_pawn(@selected)
                 @selected = false
@@ -30,7 +31,7 @@ class Game
     def movement(square)
         if check_beat(@selected ,square)
             beat(square)
-        elsif @can_beat == false
+        elsif @can_beat == false && @can_change
             check_move(square)
         end
     end
@@ -111,8 +112,15 @@ class Game
 
         @board.movement(@selected, square)
         @board.delete_pawn(beated_pawn)
-        @selected = false
-        change_turn
+        @selected = square
+
+        if check_possible_beatings(@selected)
+            @can_change = false
+        else
+            @can_change = true
+            @selected = false
+            change_turn
+        end
     end
     
     def check_possible_beatings(square)
