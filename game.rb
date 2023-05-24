@@ -28,7 +28,7 @@ class Game
     end
 
     def movement(square)
-        if check_beat(square)
+        if check_beat(@selected ,square)
             beat(square)
         elsif @can_beat == false
             check_move(square)
@@ -36,26 +36,13 @@ class Game
     end
 
     def change_turn
-
         if @turn == 'w' then @turn = 'b'
         else @turn = 'w' end
         
         pawns = @board.pawns(@turn)
         @can_beat = false
 
-        pawns.each{|x| @selected = x.square
-            case x.square % 8
-            when 0..1
-                @can_beat ||= (check_beat(@selected - 14) || check_beat(@selected + 18))
-            when 2..5
-                @can_beat ||= (check_beat(@selected - 14) || check_beat(@selected + 18))
-                @can_beat ||= (check_beat(@selected - 18) || check_beat(@selected + 14))
-            when 6..7
-                @can_beat ||= (check_beat(@selected - 18) || check_beat(@selected + 14))
-            end
-        }
-
-        @selected = false
+        pawns.each{ |x| @can_beat ||= check_possible_beatings(x.square) }
     end
 
     def check_move(square)
@@ -82,33 +69,31 @@ class Game
         end
     end
 
-    def check_beat(square)
+    def check_beat(square, check_square)
         right = [14, -18]
         left = [18, -14]
         question = false
 
-        if square >= 0 and square < 64
-            case @selected % 8
-            when 0..1
-                right.each{ |x| if square + x >= 0 && square + x < 64
-                    question ||= (@selected == square + x and @board.square_value(square) == '' and
-                    @board.square_value(square + x/2) != '' and @board.square_value(square + x/2) != @turn)
-                end}
-            when 2..5
-                right.each{ |x| if square + x >= 0 && square + x < 64
-                    question ||= (@selected == square + x and @board.square_value(square) == '' and
-                    @board.square_value(square + x/2) != '' and @board.square_value(square + x/2) != @turn)
-                end}
-                left.each{ |x| if square + x >= 0 && square + x < 64
-                    question ||= (@selected == square + x and @board.square_value(square) == '' and
-                    @board.square_value(square + x/2) != '' and @board.square_value(square + x/2) != @turn)
-                end}
-            when 6..7
-                left.each{ |x| if square + x >= 0 && square + x < 64
-                    question ||= (@selected == square + x and @board.square_value(square) == '' and
-                    @board.square_value(square + x/2) != '' and @board.square_value(square + x/2) != @turn)
-                end}
-            end
+        case square % 8
+        when 0..1
+            right.each{ |x| if check_square + x >= 0 && check_square + x < 64
+                question ||= (square == check_square + x and @board.square_value(check_square) == '' and
+                @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
+            end}
+        when 2..5
+            right.each{ |x| if check_square + x >= 0 && check_square + x < 64
+                question ||= (square == check_square + x and @board.square_value(check_square) == '' and
+                @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
+            end}
+            left.each{ |x| if check_square + x >= 0 && check_square + x < 64
+                question ||= (square == check_square + x and @board.square_value(check_square) == '' and
+                @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
+            end}
+        when 6..7
+            left.each{ |x| if check_square + x >= 0 && check_square + x < 64
+                question ||= (square == check_square + x and @board.square_value(check_square) == '' and
+                @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
+            end}
         end
 
         question
@@ -128,5 +113,21 @@ class Game
         @board.delete_pawn(beated_pawn)
         @selected = false
         change_turn
-    end     
+    end
+    
+    def check_possible_beatings(square)
+        question = false
+
+        case square % 8
+        when 0..1
+            question ||= (check_beat(square, square - 14) || check_beat(square, square + 18))
+        when 2..5
+            question ||= (check_beat(square, square - 14) || check_beat(square, square + 18))
+            question ||= (check_beat(square, square - 18) || check_beat(square, square + 14))
+        when 6..7
+            question ||= (check_beat(square, square - 18) || check_beat(square, square + 14))
+        end
+
+        question
+    end
 end
