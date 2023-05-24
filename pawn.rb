@@ -4,6 +4,7 @@ class Pawn
     def initialize(square, color)
         @square = square
         @color = color
+        @queen = false
         case @color
         when 'w'
             @pawn = Image.new(
@@ -26,6 +27,10 @@ class Pawn
         (square / 8 * 100 + 25)
     end
 
+    def queen
+        @queen
+    end
+
     def square
         @square
     end
@@ -36,6 +41,10 @@ class Pawn
 
     def color
         @color
+    end
+
+    def promote
+        @queen = true
     end
 
     def select

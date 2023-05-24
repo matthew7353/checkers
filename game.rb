@@ -29,7 +29,7 @@ class Game
     end
 
     def movement(square)
-        if check_beat(@selected ,square)
+        if check_beat(@selected, square)
             beat(square)
         elsif @can_beat == false && @can_change
             check_move(square)
@@ -62,6 +62,7 @@ class Game
         
         if question and @board.square_value(square) == ''
             @board.movement(@selected, square, true)
+            check_promotion(square)
             @selected = false
             change_turn 
         else
@@ -69,6 +70,16 @@ class Game
             @selected = false
         end
     end
+
+    def check_promotion(square)
+        case @turn
+        when 'w'
+            if square / 8 == 0 then @board.promote(square) end
+        when 'b'
+            if square / 8 == 7 then @board.promote(square) end
+        end
+    end
+
 
     def check_beat(square, check_square)
         right = [14, -18]
@@ -115,6 +126,7 @@ class Game
         if !unselect
             @can_change = false
         else
+            check_promotion(square)
             @can_change = true
             @selected = false
             change_turn

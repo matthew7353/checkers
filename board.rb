@@ -66,4 +66,13 @@ class Board
 
         result
     end
+
+    def queen(square)
+        @pawns.each{ |x| if x.square == square then x.queen end}
+    end
+
+    def promote(square)
+        @pawns.each{ |x| if x.square == square then x.promote end}
+        puts square
+    end
 end
