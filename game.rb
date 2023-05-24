@@ -43,7 +43,8 @@ class Game
         pawns = @board.pawns(@turn)
         @can_beat = false
 
-        pawns.each{ |x| @can_beat ||= check_possible_beatings(x.square) }
+        pawns.each{ |x| @can_beat ||= check_possible_beatings(x.square) 
+        if check_possible_beatings(x.square) then puts x.square end}
     end
 
     def check_move(square)
@@ -61,7 +62,7 @@ class Game
         end
         
         if question and @board.square_value(square) == ''
-            @board.movement(@selected, square)
+            @board.movement(@selected, square, true)
             @selected = false
             change_turn 
         else
@@ -75,26 +76,29 @@ class Game
         left = [18, -14]
         question = false
 
-        case square % 8
-        when 0..1
-            right.each{ |x| if check_square + x >= 0 && check_square + x < 64
-                question ||= (square == check_square + x and @board.square_value(check_square) == '' and
-                @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
-            end}
-        when 2..5
-            right.each{ |x| if check_square + x >= 0 && check_square + x < 64
-                question ||= (square == check_square + x and @board.square_value(check_square) == '' and
-                @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
-            end}
-            left.each{ |x| if check_square + x >= 0 && check_square + x < 64
-                question ||= (square == check_square + x and @board.square_value(check_square) == '' and
-                @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
-            end}
-        when 6..7
-            left.each{ |x| if check_square + x >= 0 && check_square + x < 64
-                question ||= (square == check_square + x and @board.square_value(check_square) == '' and
-                @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
-            end}
+        if check_square >= 0 and check_square < 64
+            case square % 8
+            when 0..1
+                right.each{ |x| if check_square + x >= 0 && check_square + x < 64
+                    question ||= (square == check_square + x and @board.square_value(check_square) == '' and
+                    @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
+                end}
+                if question then puts @board.square_value(check_square - 9) end
+            when 2..5
+                right.each{ |x| if check_square + x >= 0 && check_square + x < 64
+                    question ||= (square == check_square + x and @board.square_value(check_square) == '' and
+                    @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
+                end}
+                left.each{ |x| if check_square + x >= 0 && check_square + x < 64
+                    question ||= (square == check_square + x and @board.square_value(check_square) == '' and
+                    @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
+                end}
+            when 6..7
+                left.each{ |x| if check_square + x >= 0 && check_square + x < 64
+                    question ||= (square == check_square + x and @board.square_value(check_square) == '' and
+                    @board.square_value(check_square + x/2) != '' and @board.square_value(check_square + x/2) != @turn)
+                end}
+            end
         end
 
         question
@@ -103,6 +107,7 @@ class Game
     def beat(square)
         rest = @selected % 8
         sq_rest = square % 8
+        unselect = !check_possible_beatings(square)
 
         if square < @selected
             beated_pawn = @selected - (8 + (rest - sq_rest) / 2)
@@ -110,11 +115,11 @@ class Game
             beated_pawn = @selected + (8 + (sq_rest - rest) / 2)
         end
 
-        @board.movement(@selected, square)
+        @board.movement(@selected, square, unselect)
         @board.delete_pawn(beated_pawn)
         @selected = square
 
-        if check_possible_beatings(@selected)
+        if !unselect
             @can_change = false
         else
             @can_change = true
