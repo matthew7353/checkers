@@ -45,12 +45,15 @@ class Board
         end}
     end
 
-    def movement(entry, result)
+    def movement(entry, result, unselect)
         @board[result] = @board[entry]
         @board[entry] = ''
         @pawns.each{|x|
         if x.square == entry
             x.unselect(result)
+            if unselect == false
+                select_pawn(result)
+            end
         end}
     end
 
