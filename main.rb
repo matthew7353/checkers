@@ -3,7 +3,7 @@ require 'ruby2d'
 require_relative 'game'
 
 
-board = Image.new('images/board.jpg')
+board = Image.new('images/board1.jpg')
 set width: 850
 set height: 850
 set resizable: true

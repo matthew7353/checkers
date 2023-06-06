@@ -8,12 +8,12 @@ class Pawn
         case @color
         when 'w'
             @pawn = Image.new(
-            'images/white.jpg',
+            'images/white1.jpg',
             x: count_x(@square), y: count_y(square)
             )
         when 'b'
             @pawn = Image.new(
-                'images/black.jpg',
+                'images/black1.jpg',
                 x: count_x(@square), y: count_y(square)
                 )
         end
